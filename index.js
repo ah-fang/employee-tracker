@@ -17,6 +17,8 @@ update an employee role.
 
 */
 const inquirer = require('inquirer');
+const db = require('./config/connection');
+const cTable = require('console.table');
 
 const promptMenu = () => {
     return inquirer
@@ -37,7 +39,7 @@ const promptMenu = () => {
         }
     ])
     .then(menuChoice => {
-        switch(menuChoice) {
+        switch(menuChoice.menu) {
             case 'View All Departments':
                 viewDepts();
                 break; 
@@ -66,24 +68,77 @@ const promptMenu = () => {
 const viewDepts = () => {
     // WHEN I choose to view all departments
     // THEN I am presented with a formatted table showing department names and department ids
-    // "SELECT * from departments"
+    const sql = `SELECT * FROM department;`;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        console.table(rows);
+    });
+
 };
 
 const viewRoles = () => {
     // WHEN I choose to view all roles
     // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
-    // "SELECT * from roles"   
+    const sql = `SELECT * FROM role`;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.table(rows);
+    }); 
 };
 
 const viewEmps = () => {
     // WHEN I choose to view all employees
     // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
-    // "SELECT * from employees"
+    const sql = `SELECT * FROM employee`;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.table(rows);
+    });
 };
 
 const addDept = () => {
     // WHEN I choose to add a department
     // THEN I am prompted to enter the name of the department and that department is added to the database
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'dept',
+            message: 'What is the name of the new department?'
+        }
+    ]).then(deptTitle => {
+        const newName = deptTitle.dept;
+        const sql = `INSERT INTO department (name) VALUES ('${newName}');`;
+        const sql2 = `SELECT * FROM department;`;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log('Successfully added new Department. Updated list:');
+    });
+    db.query(sql2, (err, rows) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.table(rows);
+        
+    });
+    })
 };
 
 const addRole = () => {
@@ -91,6 +146,33 @@ const addRole = () => {
     // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
     // inquirer prompts to get employee information
     // then pass that info to the database "INSERT into roles VALUES (the values we got)"
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'role',
+            message: 'What is the title of the new role?'
+        }
+    ]).then(roleTitle => {
+        const newRole = roleTitle.role;
+        const sql = `INSERT INTO role (title) VALUES ('${newRole}');`;
+        const sql2 = `SELECT * FROM role;`;
+
+    db.query(sql, (err) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log('Successfully added new Role. Updated list:');
+    });
+    db.query(sql2, (err, rows) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.table(rows);
+        
+    });
+    })
 };
 
 const addEmp = () => {
@@ -106,7 +188,7 @@ const updateEmpRole = () => {
 };
 
 init = () => {
-    promptMenu
+    promptMenu();
 }
 
 init();
