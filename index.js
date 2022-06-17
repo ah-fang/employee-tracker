@@ -2,10 +2,8 @@ const inquirer = require('inquirer');
 const db = require('./config/connection');
 const cTable = require('console.table');
 
-//functions
 const {viewDepts, viewRoles, viewEmps, addDept, addRole, addEmp, updateEmpRole} = require('./functions.js'); 
 
-//prompt response functions 
 const promptMenu = () => {
     return inquirer
         .prompt([
